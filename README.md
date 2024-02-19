@@ -1,1 +1,2 @@
-# TelegramBot
+# Telegram Bot
+Welcome to the Bot-Telegram repository! This repository is dedicated to the development and maintenance of a Telegram bot designed to perform [describe the main functions of your bot, e.g., "providing news updates, managing tasks, conducting surveys, etc."]. Built with [mention technologies used, e.g., "Python, Node.js, etc."], this bot aims to enhance user interaction and provide utility through the Telegram platform.
