@@ -1,2 +1,6 @@
 # Telegram Bot
-Welcome to the Bot-Telegram repository! This repository is dedicated to the development and maintenance of a Telegram bot designed to perform [describe the main functions of your bot, e.g., "providing news updates, managing tasks, conducting surveys, etc."]. Built with [mention technologies used, e.g., "Python, Node.js, etc."], this bot aims to enhance user interaction and provide utility through the Telegram platform.
+Welcome to the Bot-Telegram repository!
+
+
+Description:
+GenreBot is an interactive Telegram bot crafted to streamline the music categorization process. Designed with a user-friendly interface, it allows users to upload music files and classify them by genre with a simple button click. Developed in Python, the bot features a robust validation system to ensure only authorized users can interact with it. Each music file is tagged with the user's name and the chosen genre before being forwarded to a predefined group, creating an organized and engaging music sharing experience.
