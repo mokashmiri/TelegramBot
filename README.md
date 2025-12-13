@@ -14,6 +14,9 @@ GenreBot is a Python-based Telegram bot that provides a user-friendly interface 
 - [Key Concepts](#key-concepts)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
+- [Deployment and Maintenance](#deployment-and-maintenance)
+  - [AWS EC2 Deployment](#aws-ec2-deployment)
+  - [Maintenance and Monitoring](#maintenance-and-monitoring)
 - [Project Structure](#project-structure)
 - [Usage](#usage)
 
@@ -27,6 +30,7 @@ GenreBot is a Python-based Telegram bot that provides a user-friendly interface 
 | **Framework** | python-telegram-bot or Pyrogram |
 | **API** | Telegram Bot API |
 | **Paradigm** | Event-driven Programming, Object-Oriented Programming |
+| **Cloud Platform** | AWS EC2 |
 | **Version Control** | Git (GitHub) |
 
 ---
@@ -159,6 +163,212 @@ Create a `.env` file or configuration file with the following variables:
 3. Add the bot to your target groups with appropriate permissions
 4. Configure authorized users list
 5. Set up genre-to-group mappings
+
+---
+
+## Deployment and Maintenance
+
+### AWS EC2 Deployment
+
+The bot can be deployed and maintained on AWS EC2 for reliable, scalable, and cost-effective hosting.
+
+#### Prerequisites for EC2 Deployment
+
+- AWS Account with EC2 access
+- EC2 instance (Ubuntu 20.04 LTS or Amazon Linux 2 recommended)
+- Security Group configured to allow necessary traffic
+- SSH access to the EC2 instance
+
+#### EC2 Instance Setup
+
+1. **Launch EC2 Instance**:
+   - Choose an appropriate instance type (t2.micro or t3.micro for small bots)
+   - Select Ubuntu Server 20.04 LTS or Amazon Linux 2 AMI
+   - Configure security group to allow SSH (port 22)
+   - Create or select a key pair for SSH access
+
+2. **Connect to EC2 Instance**:
+```bash
+ssh -i your-key.pem ubuntu@your-ec2-ip-address
+```
+
+3. **Install Dependencies**:
+```bash
+# Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Install Python and pip
+sudo apt install python3 python3-pip -y
+
+# Install git
+sudo apt install git -y
+```
+
+4. **Clone and Setup Bot**:
+```bash
+# Clone repository
+git clone https://github.com/mokashmiri/TelegramBot.git
+cd TelegramBot/Telegram\ Music\ Bot
+
+# Install Python dependencies
+pip3 install -r requirements.txt
+
+# Create .env file with configuration
+nano .env
+```
+
+5. **Configure Environment Variables**:
+   - Add all required environment variables to `.env` file
+   - Ensure BOT_TOKEN, API_ID, API_HASH, and other credentials are set
+
+6. **Run Bot in Background**:
+```bash
+# Using nohup
+nohup python3 bot.py > bot.log 2>&1 &
+
+# Or using screen (recommended)
+screen -S telegrambot
+python3 bot.py
+# Press Ctrl+A then D to detach
+```
+
+#### Using systemd for Service Management
+
+Create a systemd service for better process management:
+
+1. **Create Service File**:
+```bash
+sudo nano /etc/systemd/system/telegrambot.service
+```
+
+2. **Service Configuration**:
+```ini
+[Unit]
+Description=Telegram Music Bot
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/TelegramBot/Telegram Music Bot
+Environment="PATH=/usr/bin:/usr/local/bin"
+ExecStart=/usr/bin/python3 /home/ubuntu/TelegramBot/Telegram\ Music\ Bot/bot.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. **Enable and Start Service**:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable telegrambot
+sudo systemctl start telegrambot
+```
+
+4. **Check Service Status**:
+```bash
+sudo systemctl status telegrambot
+```
+
+### Maintenance and Monitoring
+
+#### Monitoring Bot Status
+
+1. **Check Bot Logs**:
+```bash
+# If using systemd
+sudo journalctl -u telegrambot -f
+
+# If using nohup
+tail -f bot.log
+
+# If using screen
+screen -r telegrambot
+```
+
+2. **Monitor System Resources**:
+```bash
+# Check CPU and memory usage
+htop
+
+# Check disk space
+df -h
+
+# Check bot process
+ps aux | grep bot.py
+```
+
+#### Regular Maintenance Tasks
+
+1. **Update Bot Code**:
+```bash
+cd TelegramBot
+git pull origin main
+# Restart service if using systemd
+sudo systemctl restart telegrambot
+```
+
+2. **Update System Packages**:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+3. **Rotate Logs**:
+   - Implement log rotation to prevent disk space issues
+   - Use `logrotate` or manual cleanup of old log files
+
+4. **Backup Configuration**:
+   - Regularly backup `.env` file and configuration
+   - Store backups in S3 or another secure location
+
+#### EC2 Cost Optimization
+
+- Use EC2 Spot Instances for cost savings (with appropriate handling)
+- Monitor instance usage and resize if needed
+- Set up CloudWatch alarms for cost monitoring
+- Use Reserved Instances for long-term deployments
+
+#### Security Best Practices
+
+1. **SSH Security**:
+   - Use key-based authentication only
+   - Disable password authentication
+   - Regularly rotate SSH keys
+
+2. **Firewall Configuration**:
+   - Only open necessary ports
+   - Use Security Groups effectively
+   - Implement VPC for network isolation
+
+3. **Environment Variables**:
+   - Never commit `.env` file to repository
+   - Use AWS Systems Manager Parameter Store or Secrets Manager for sensitive data
+   - Regularly rotate API keys and tokens
+
+4. **Access Control**:
+   - Use IAM roles for EC2 instance permissions
+   - Implement least privilege principle
+   - Enable CloudTrail for audit logging
+
+#### Troubleshooting
+
+1. **Bot Not Responding**:
+   - Check service status: `sudo systemctl status telegrambot`
+   - Review logs for errors
+   - Verify network connectivity
+   - Check Telegram API status
+
+2. **High Resource Usage**:
+   - Monitor with `htop` or CloudWatch
+   - Check for memory leaks
+   - Consider upgrading instance type if needed
+
+3. **Connection Issues**:
+   - Verify security group rules
+   - Check bot token validity
+   - Ensure internet connectivity on EC2 instance
 
 ---
 
